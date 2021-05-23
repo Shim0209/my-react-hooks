@@ -1,17 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import defaultAxios from 'axios';
-
-const api = defaultAxios.create({
-    baseURL: "https://yts.mx/api/v2/"
-})
-const movieApi = {
-    movieList: (pages, limits) => api.get("list_movies.json", {
-        params: {
-            page: pages,
-            limit: limits,
-        }
-    })
-}
+import { movieApi } from "./movieApi";
+import uniqBy from "lodash.uniqby";
 
 const useScrollAxios = () => {
     let [state, setState] = useState({
@@ -22,13 +11,14 @@ const useScrollAxios = () => {
     let [isBottom, setIsBottom] = useState(false);
 
     useEffect(()=>{
-        movieApi.movieList(page, 50).then(data => {
+        movieApi.pageList(page).then(data => {
             setState({
                 loading:false, 
-                movie: state.movie.concat(data.data.data.movies)
+                movie: uniqBy(state.movie.concat(data.data.data.movies), "id")
             });
             page++;
             setPage(page);
+            console.log("infiniteScroll-returnIsBottom");
             setIsBottom(false);
         })}, [isBottom]);
     
@@ -36,7 +26,8 @@ const useScrollAxios = () => {
         const scrollTop = document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
-        if(scrollTop + clientHeight >= scrollHeight-20) {
+        if(scrollTop + clientHeight >= scrollHeight-10) {
+            console.log("infiniteScroll-setIsBottom");
             setIsBottom(true);
         }
     };
@@ -48,7 +39,7 @@ const useScrollAxios = () => {
         }
     }, []);
 
-    return {...state};
+    return {...state, page};
 }
 
 export default useScrollAxios;

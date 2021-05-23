@@ -18,7 +18,6 @@ const useScrollAxios = () => {
             });
             page++;
             setPage(page);
-            console.log("infiniteScroll-returnIsBottom");
             setIsBottom(false);
         })}, [isBottom]);
     
@@ -27,7 +26,6 @@ const useScrollAxios = () => {
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
         if(scrollTop + clientHeight >= scrollHeight-10) {
-            console.log("infiniteScroll-setIsBottom");
             setIsBottom(true);
         }
     };
